@@ -1,0 +1,65 @@
+---
+title: "International VPN access"
+format: html
+editor: visual
+---
+
+<!-- This file is not finished! -->
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+#| echo: false
+#| eval: true 
+#| file: international-vpn-access.R
+
+
+# LOAD LIBRARIES ----
+
+# Install the pacman package to call all the other packages
+if (!require("pacman")) install.packages("pacman")
+
+# Use pacman to install (if req) and load required packages
+pacman::p_load(
+  dplyr,
+  lubridate,
+  tidyverse,
+  ggthemes,
+  data.table,
+  ggtext,
+  devtools,
+  gt,
+  mapview
+)
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+#| warning: false
+
+gt_tbl <- dtm_group |>
+  gt::gt(groupname_col = "COUNTRY_NAME", rowname_col = "LOCALITY_NAME") |>
+  gt::cols_label(
+    COUNTRY_NAME = 'Country',
+    LOCALITY_NAME = 'City',
+    Username = 'Username') |> 
+  gt::tab_header(
+    title = 'International VPN users',
+    subtitle = 'Persons against location, June and July 2023') |>
+  gt::opt_stylize(style = 6, color = 'gray')
+
+
+gt_tbl |> gt::as_raw_html()
+
+```
+
+
+
