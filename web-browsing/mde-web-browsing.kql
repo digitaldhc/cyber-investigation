@@ -1,0 +1,5 @@
+DeviceNetworkEvents
+| where  DeviceName contains "hostname"
+| where RemoteUrl != ""
+| project Timestamp, RemoteUrl, RemoteIP, InitiatingProcessAccountName, DeviceName
+| order by Timestamp
