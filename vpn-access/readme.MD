@@ -10,13 +10,13 @@ Before you start you will need the following:
 
 -   access to run PowerShell commands against your AOVPN nodes;
 
--   the IP2location csv data file;
+-   an account with the free [Ip2location Lite service](https://lite.ip2location.com/) and a download token;
 
 -   the R script in this repository.
 
 ## R and RStudio
 
-R is a programming language statistical computing and data mining. It is augmented by a large number of extensions packages and is freely available on Windows, MacOS and Linux.The easiest way to get going with R is to download R and RStudio from <https://www.rstudio.com/products/rstudio/download/#download> or request it from your IT team.
+R is a programming language for statistical computing and data mining. It is augmented by a large number of extensions packages and is freely available on Windows, MacOS and Linux.The easiest way to get going with R is to download R and RStudio from <https://www.rstudio.com/products/rstudio/download/#download> or request it from your IT team.
 
 ## PowerShell access
 
@@ -32,7 +32,9 @@ You should run this command against each AOVPN node, creating a separate csv fil
 
 ## IP2location csv data file
 
-To obtain the IP address geolocation you will need to register for a free account at <https://lite.ip2location.com> and download the DB9.LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE csv file - this will be provided in the form of a zip archive. Once unzipped you should see that the file is named `IP2LOCATION-LITE-DB9.CSV`.
+To obtain the IP address geolocation you will need to register for a free account at <https://lite.ip2location.com> and copy the **download token** from the top of the download page. You will need to create an [R environment variable](https://cran.r-project.org/web/packages/httr/vignettes/secrets.html) called `ip2loc_api` - the easiest way to do this is to create a file called `.Renviron` in your R home directory and add the following line (without the curly brackets):
+
+`ip2locapi = {DOWNLOAD_TOKEN}`
 
 ## R script
 
@@ -40,23 +42,23 @@ The R script [international-vpn-access.R](https://github.com/digitaldhc/cyber-in
 
 # Running the script
 
-First, ensure your AOVPN csv files and IP2LOCATION-LITE-DB9.CSV are in the same directory on your computer. This will be your working directory.
+First, ensure your AOVPN csv files are in the same directory on your computer. This will be your working directory.
 
 Load RStudio and open international-vpn-access.R.
 
 The first command in the file is `setwd("C:/b/")` - change this path to that of your working directory. Note that even on Windows, R will expect to see forward slashes in directory paths.
 
-Now scroll down to the IMPORT DATA section and look for the line `df_csv1 <- read.csv(file = "csv1.csv")` . Ensure there is a line for each AOVPN csv file you have to import. If you have fewer than three files, delete the lines for csv files that do not exist.
+Now scroll down to the IMPORT VPN DATA section and look for the line `df_csv1 <- read.csv(file = "csv1.csv")` . Ensure there is a line for each AOVPN csv file you have to import. If you have fewer than three files, delete the lines for csv files that do not exist.
 
 Now look at the next section, where we use the `rbind` command to merge the dataframe we will create for each csv file. Ensure the arguments for the `rbind` command match the dataframes that you will create. If you only have one csv file to import you can ignore this command and comment it out.
 
-Now select all the lines in the script up to the line `# DO NOT SELECT BELOW THIS LINE UNLESS YOU WANT TO CREATE MAPS ----` . The maps can take a long time to build and you may not require them.
-
-Click the Run button at the top right of the code window. The code will execute in the console window of RStudio. Depending on your computer and the amount of data involved this may take a short while - on my computer and with my data it takes approximately one minute to run.
+Now select all the lines in the script and click the Run button at the top right of the code window. The code will execute in the console window of RStudio. Depending on your computer and the amount of data involved this may take a short while - on my computer and with my data it takes a couple of minutes to run.
 
 # Output
 
-If all goes well, you will have three new csv files in your working directory once the script completes:
+If all goes well, you will have an Excel workbook in your working directory once the script completes. This is customisable using the openxlsx2 commands towards the end of the script file.
+
+There are also commented statements in the file that can produce the following CSV files in your working directory:
 
 -   vpn_all.csv showing geo-location for all VPN connections
 

@@ -19,52 +19,23 @@ pacman::p_load(
   dplyr,
   lubridate,
   tidyverse,
-  ggthemes,
+#  ggthemes,
   data.table,
-  ggtext,
+#  ggtext,
   devtools,
   mapview,
   webshot,
-#  xlsx,
   openxlsx2,
   httr
 )
 
-#++++++++++++++++++++++++
-# Helper function to add titles
-#++++++++++++++++++++++++
-# - sheet : sheet object to contain the title
-# - rowIndex : numeric value indicating the row to 
-#contain the title
-# - title : the text to use as title
-# - titleStyle : style object to use for title
-# xlsx.addTitle<-function(sheet, rowIndex, title, titleStyle){
-#   rows <-createRow(sheet,rowIndex=rowIndex)
-#   sheetTitle <-createCell(rows, colIndex=1)
-#   setCellValue(sheetTitle[[1,1]], title)
-#   setCellStyle(sheetTitle[[1,1]], titleStyle)
-# }
-# 
-# xlsx.addTitle2<-function(sheet, rowIndex, title, titleStyle){
-#   rows <-createRow(sheet,rowIndex=rowIndex)
-#   sheetTitle <-createCell(rows, colIndex=2)
-#   setCellValue(sheetTitle[[1,1]], title)
-#   setCellStyle(sheetTitle[[1,1]], titleStyle)
-# }
-
 # SET VARIABLES ----
-
-# prompt for user input - unused
-# filenamesuffix <- readline(prompt="Enter filename suffix: ")
 
 # extract the current date
 current_month <- Sys.Date()
 
 # format as a string for naming files
 filenamesuffix <- format(current_month, "%Y_%m_%d")
-
-# format as a string for printing
-current_month_print <- format(current_month, "%B %Y")
 
 # IMPORT VPN DATA ----
 
@@ -84,7 +55,17 @@ dt_ips <- rbind(df_csv2, df_csv3)
 
 # set ip2location zipfile path
 # api token is stored as environment variable ip2loc_api
+# more about environment variables and secret management
+# https://cran.r-project.org/web/packages/httr/vignettes/secrets.html
 zip_path <- paste("https://www.ip2location.com/download/?token=", Sys.getenv("ip2loc_api"), "&file=DB9LITECSV", sep = "")
+
+# check temp folder exists
+# and create it if not
+if (file.exists("./temp")) { 
+  } else
+  {
+    dir.create("./temp")
+  }
 
 # set download file path and name for downloaded data
 file_name <- "temp/IP2LOCATION-LITE-DB9.ZIP"
@@ -97,7 +78,6 @@ unzip(file_name, files = "IP2LOCATION-LITE-DB9.CSV", overwrite = TRUE, exdir = "
 
 # import the ip2location csv you have downloaded from
 #  https://lite.ip2location.com/
-# this csv file needs to be located in your working directory
 dt_ip2location <- read.csv(file = "temp/IP2LOCATION-LITE-DB9.CSV", header = FALSE)
 
 # the ip2location csv does not come with column headers so we will add these manually
@@ -174,12 +154,12 @@ dtm_group <- dtm_abroad %>%
 
 # PRESENT AND EXPORT DATA AS CSV ----
 
+# all commented out for Dorset HealthCare use but can be enabled
+
 # export to csv - all
-# useful for testing but not needed in live
 # write.csv(dtm, file = paste("vpn_all_", filenamesuffix, ".csv" , sep = ""), row.names = FALSE)
 
 # export to csv - international only
-# useful for testing but not needed in live
 # write.csv(dtm_abroad, file = paste("vpn_intl_", filenamesuffix, ".csv" , sep = ""), row.names = FALSE)
 
 # export to csv - GB only
@@ -202,7 +182,7 @@ map_abroad
 webshot::install_phantomjs()
 mapview::mapshot(map_abroad, file = paste("vpn_intl_map_", filenamesuffix, ".png" , sep = ""))
 
-# create a var with the file name
+# create a var with the file name to use later
 img_map <- paste("vpn_intl_map_", filenamesuffix, ".png" , sep = "")
 
 # GB CONNECTIONS MAP ----
@@ -215,7 +195,7 @@ img_map <- paste("vpn_intl_map_", filenamesuffix, ".png" , sep = "")
 
 # EXCEL FILE ----
 
-# create the start and end dates for the title
+# create the various date strings for the spreadsheet report
 date_start <- min(dtm_abroad$ConnectionStartDate)
 date_end <- max(dtm_abroad$ConnectionStartDate)
 date_start_print <- format(date_start, "%d %B %Y")
